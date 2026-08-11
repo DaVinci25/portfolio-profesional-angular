@@ -149,161 +149,214 @@
       novalidate
     >
       <section
-        id="section-profile"
-        class="form-section"
+  id="section-projects"
+  class="form-section"
+>
+  <div class="section-heading">
+    <div>
+      <span>06 · PROYECTOS</span>
+
+      <h2>Proyectos destacados</h2>
+
+      <p>
+        Presenta proyectos que demuestren tus conocimientos,
+        experiencia y capacidad para resolver problemas.
+      </p>
+    </div>
+
+    <button
+      type="button"
+      class="button add-button"
+      (click)="addProject()"
+    >
+      + Añadir
+    </button>
+  </div>
+
+  <div formArrayName="projects">
+    @for (
+      project of projects.controls;
+      track project;
+      let index = $index
+    ) {
+      <article
+        class="form-card"
+        [formGroupName]="index"
       >
-        <div class="section-heading">
-          <div>
-            <span>01 · PERFIL</span>
-            <h2>Información personal</h2>
-            <p>
-              Presenta quién eres y facilita que puedan contactar
-              contigo.
-            </p>
+        <div class="card-heading">
+          <strong>
+            Proyecto {{ index + 1 }}
+          </strong>
+
+          <div class="card-actions">
+            <button
+              type="button"
+              title="Subir proyecto"
+              aria-label="Subir proyecto"
+              [disabled]="index === 0"
+              (click)="moveProject(index, -1)"
+            >
+              ↑
+            </button>
+
+            <button
+              type="button"
+              title="Bajar proyecto"
+              aria-label="Bajar proyecto"
+              [disabled]="index === projects.length - 1"
+              (click)="moveProject(index, 1)"
+            >
+              ↓
+            </button>
+
+            <button
+              type="button"
+              class="danger-button"
+              (click)="removeProject(index)"
+            >
+              Eliminar
+            </button>
           </div>
         </div>
 
-        <div class="profile-image-editor">
-          <div class="profile-image">
-            @if (profileImage) {
+        <div class="project-image-editor">
+          <div class="project-image-preview">
+            @if (project.get('image')?.value) {
               <img
-                [src]="profileImage"
-                alt="Fotografía de perfil"
+                [src]="project.get('image')?.value"
+                [alt]="
+                  'Vista previa del proyecto ' +
+                  (
+                    project.get('name')?.value ||
+                    'número ' + (index + 1)
+                  )
+                "
               />
             } @else {
-              <span>{{ profileInitials }}</span>
+              <div class="project-image-empty">
+                <span>
+                  {{
+                    project
+                      .get('name')
+                      ?.value
+                      ?.charAt(0)
+                      ?.toUpperCase() || 'P'
+                  }}
+                </span>
+
+                <small>Sin imagen</small>
+              </div>
             }
           </div>
 
-          <div>
-            <label class="button secondary-light-button import-button">
-              Seleccionar fotografía
+          <div class="project-image-actions">
+            <label
+              class="button secondary-light-button import-button"
+            >
+              {{
+                project.get('image')?.value
+                  ? 'Cambiar imagen'
+                  : 'Seleccionar imagen'
+              }}
 
               <input
                 type="file"
                 accept="image/jpeg,image/png,image/webp"
-                (change)="uploadProfileImage($event)"
+                (change)="uploadProjectImage($event, index)"
               />
             </label>
 
-            @if (profileImage) {
+            @if (project.get('image')?.value) {
               <button
                 type="button"
                 class="text-button danger-button"
-                (click)="removeProfileImage()"
+                (click)="removeProjectImage(index)"
               >
-                Eliminar fotografía
+                Eliminar imagen
               </button>
             }
 
-            <small>JPG, PNG o WebP. Máximo 2 MB.</small>
+            <small>
+              Formato horizontal recomendado. La imagen se
+              convertirá automáticamente a WebP con una resolución
+              máxima de 1200 × 675 píxeles.
+            </small>
           </div>
         </div>
 
         <div class="form-grid">
           <label class="field full-field">
-            <span>Nombre completo *</span>
+            <span>Nombre del proyecto</span>
+
             <input
               type="text"
-              formControlName="fullName"
-              placeholder="Nombre y apellidos"
+              formControlName="name"
+              placeholder="Portfolio profesional"
             />
           </label>
 
           <label class="field full-field">
-            <span>Título profesional *</span>
-            <input
-              type="text"
-              formControlName="professionalTitle"
-              placeholder="Desarrollador frontend"
-            />
-          </label>
+            <span>Descripción</span>
 
-          <label class="field">
-            <span>Correo electrónico</span>
-            <input
-              type="email"
-              formControlName="email"
-              placeholder="nombre@correo.com"
-            />
-          </label>
-
-          <label class="field">
-            <span>Teléfono</span>
-            <input
-              type="tel"
-              formControlName="phone"
-              placeholder="+34 600 000 000"
-            />
-          </label>
-
-          <label class="field">
-            <span>Ubicación</span>
-            <input
-              type="text"
-              formControlName="location"
-              placeholder="Madrid, España"
-            />
-          </label>
-
-          <label class="field">
-            <span>Disponibilidad</span>
-            <select formControlName="availability">
-              <option value="">
-                Sin especificar
-              </option>
-              <option value="Disponible para nuevas oportunidades">
-                Disponible para nuevas oportunidades
-              </option>
-              <option value="Disponible para proyectos freelance">
-                Disponible para proyectos freelance
-              </option>
-              <option value="Abierto a colaboraciones">
-                Abierto a colaboraciones
-              </option>
-              <option value="No disponible actualmente">
-                No disponible actualmente
-              </option>
-            </select>
-          </label>
-
-          <label class="field full-field">
-            <span>Resumen profesional</span>
             <textarea
-              rows="6"
-              formControlName="summary"
-              placeholder="Experiencia, especialización y objetivos"
+              rows="5"
+              formControlName="description"
+              placeholder="Describe el objetivo, las funcionalidades y los resultados del proyecto"
             ></textarea>
           </label>
 
-          <label class="field">
-            <span>Sitio web</span>
-            <input
-              type="url"
-              formControlName="website"
-              placeholder="https://misitio.com"
-            />
-          </label>
-
-          <label class="field">
-            <span>LinkedIn</span>
-            <input
-              type="url"
-              formControlName="linkedin"
-              placeholder="https://linkedin.com/in/usuario"
-            />
-          </label>
-
           <label class="field full-field">
-            <span>GitHub</span>
+            <span>Tecnologías</span>
+
+            <input
+              type="text"
+              formControlName="technologies"
+              placeholder="Angular, TypeScript, SCSS"
+            />
+          </label>
+
+          <label class="field">
+            <span>Demostración</span>
+
             <input
               type="url"
-              formControlName="github"
-              placeholder="https://github.com/usuario"
+              formControlName="demoUrl"
+              placeholder="https://mi-portfolio.com"
             />
+          </label>
+
+          <label class="field">
+            <span>Repositorio</span>
+
+            <input
+              type="url"
+              formControlName="repositoryUrl"
+              placeholder="https://github.com/usuario/proyecto"
+            />
+          </label>
+
+          <label class="checkbox-field">
+            <input
+              type="checkbox"
+              formControlName="featured"
+            />
+
+            Proyecto destacado
+          </label>
+
+          <label class="checkbox-field">
+            <input
+              type="checkbox"
+              formControlName="visible"
+            />
+
+            Mostrar proyecto
           </label>
         </div>
-      </section>
+      </article>
+    }
+  </div>
+</section>
 
       <section
         id="section-experience"
@@ -338,36 +391,40 @@
               [formGroupName]="index"
             >
               <div class="card-heading">
-                <strong>Experiencia {{ index + 1 }}</strong>
+  <strong>
+    Experiencia {{ index + 1 }}
+  </strong>
 
-                <div class="card-actions">
-                  <button
-                    type="button"
-                    title="Subir"
-                    [disabled]="index === 0"
-                    (click)="moveExperience(index, -1)"
-                  >
-                    ↑
-                  </button>
+  <div class="card-actions">
+    <button
+      type="button"
+      title="Subir experiencia"
+      aria-label="Subir experiencia"
+      [disabled]="index === 0"
+      (click)="moveExperience(index, -1)"
+    >
+      ↑
+    </button>
 
-                  <button
-                    type="button"
-                    title="Bajar"
-                    [disabled]="index === experiences.length - 1"
-                    (click)="moveExperience(index, 1)"
-                  >
-                    ↓
-                  </button>
+    <button
+      type="button"
+      title="Bajar experiencia"
+      aria-label="Bajar experiencia"
+      [disabled]="index === experiences.length - 1"
+      (click)="moveExperience(index, 1)"
+    >
+      ↓
+    </button>
 
-                  <button
-                    type="button"
-                    class="danger-button"
-                    (click)="removeExperience(index)"
-                  >
-                    Eliminar
-                  </button>
-                </div>
-              </div>
+    <button
+      type="button"
+      class="danger-button"
+      (click)="removeExperience(index)"
+    >
+      Eliminar
+    </button>
+  </div>
+</div>
 
               <div class="form-grid">
                 <label class="field">
