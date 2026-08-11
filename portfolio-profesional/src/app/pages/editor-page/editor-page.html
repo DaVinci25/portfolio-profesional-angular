@@ -1,1 +1,930 @@
-<p>editor-page works!</p>
+@if (message) {
+  <div class="notification" role="status">
+    {{ message }}
+  </div>
+}
+
+<main class="editor-page">
+  <header class="editor-header">
+    <div>
+      <span class="eyebrow">PORTFOLIO STUDIO</span>
+      <h1>Editor del portfolio</h1>
+      <p>
+        Completa tu información y comprueba el resultado en la vista
+        pública.
+      </p>
+    </div>
+
+    <div class="header-actions">
+      <label class="button secondary-button import-button">
+        Importar JSON
+
+        <input
+          type="file"
+          accept=".json,application/json"
+          (change)="importPortfolio($event)"
+        />
+      </label>
+
+      <button
+        type="button"
+        class="button secondary-button"
+        (click)="exportPortfolio()"
+      >
+        Exportar JSON
+      </button>
+
+      <a
+        class="button primary-button"
+        routerLink="/portfolio"
+      >
+        Ver portfolio
+      </a>
+    </div>
+  </header>
+
+  <section class="progress-card">
+    <div class="progress-information">
+      <div>
+        <strong>Progreso del portfolio</strong>
+        <span>{{ saveStatus }}</span>
+      </div>
+
+      <strong class="progress-percentage">
+        {{ progress }}%
+      </strong>
+    </div>
+
+    <div class="progress-track">
+      <div
+        class="progress-value"
+        [style.width.%]="progress"
+      ></div>
+    </div>
+
+    @if (progress < 100) {
+      <p>
+        Añade información de contacto, experiencia, formación,
+        habilidades, proyectos y enlaces profesionales para completar
+        tu perfil.
+      </p>
+    } @else {
+      <p class="complete-message">
+        Tu portfolio contiene toda la información principal.
+      </p>
+    }
+  </section>
+
+  <div class="editor-layout">
+    <aside class="section-navigation">
+      <strong>Secciones</strong>
+
+      <button
+        type="button"
+        [class.active]="activeSection === 'profile'"
+        (click)="selectSection('profile')"
+      >
+        <span>01</span>
+        Perfil
+      </button>
+
+      <button
+        type="button"
+        [class.active]="activeSection === 'experience'"
+        (click)="selectSection('experience')"
+      >
+        <span>02</span>
+        Experiencia
+      </button>
+
+      <button
+        type="button"
+        [class.active]="activeSection === 'education'"
+        (click)="selectSection('education')"
+      >
+        <span>03</span>
+        Formación
+      </button>
+
+      <button
+        type="button"
+        [class.active]="activeSection === 'skills'"
+        (click)="selectSection('skills')"
+      >
+        <span>04</span>
+        Habilidades
+      </button>
+
+      <button
+        type="button"
+        [class.active]="activeSection === 'languages'"
+        (click)="selectSection('languages')"
+      >
+        <span>05</span>
+        Idiomas
+      </button>
+
+      <button
+        type="button"
+        [class.active]="activeSection === 'projects'"
+        (click)="selectSection('projects')"
+      >
+        <span>06</span>
+        Proyectos
+      </button>
+
+      <button
+        type="button"
+        [class.active]="activeSection === 'design'"
+        (click)="selectSection('design')"
+      >
+        <span>07</span>
+        Diseño
+      </button>
+    </aside>
+
+    <form
+      class="editor-form"
+      [formGroup]="portfolioForm"
+      novalidate
+    >
+      <section
+        id="section-profile"
+        class="form-section"
+      >
+        <div class="section-heading">
+          <div>
+            <span>01 · PERFIL</span>
+            <h2>Información personal</h2>
+            <p>
+              Presenta quién eres y facilita que puedan contactar
+              contigo.
+            </p>
+          </div>
+        </div>
+
+        <div class="profile-image-editor">
+          <div class="profile-image">
+            @if (profileImage) {
+              <img
+                [src]="profileImage"
+                alt="Fotografía de perfil"
+              />
+            } @else {
+              <span>{{ profileInitials }}</span>
+            }
+          </div>
+
+          <div>
+            <label class="button secondary-light-button import-button">
+              Seleccionar fotografía
+
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                (change)="uploadProfileImage($event)"
+              />
+            </label>
+
+            @if (profileImage) {
+              <button
+                type="button"
+                class="text-button danger-button"
+                (click)="removeProfileImage()"
+              >
+                Eliminar fotografía
+              </button>
+            }
+
+            <small>JPG, PNG o WebP. Máximo 2 MB.</small>
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <label class="field full-field">
+            <span>Nombre completo *</span>
+            <input
+              type="text"
+              formControlName="fullName"
+              placeholder="Nombre y apellidos"
+            />
+          </label>
+
+          <label class="field full-field">
+            <span>Título profesional *</span>
+            <input
+              type="text"
+              formControlName="professionalTitle"
+              placeholder="Desarrollador frontend"
+            />
+          </label>
+
+          <label class="field">
+            <span>Correo electrónico</span>
+            <input
+              type="email"
+              formControlName="email"
+              placeholder="nombre@correo.com"
+            />
+          </label>
+
+          <label class="field">
+            <span>Teléfono</span>
+            <input
+              type="tel"
+              formControlName="phone"
+              placeholder="+34 600 000 000"
+            />
+          </label>
+
+          <label class="field">
+            <span>Ubicación</span>
+            <input
+              type="text"
+              formControlName="location"
+              placeholder="Madrid, España"
+            />
+          </label>
+
+          <label class="field">
+            <span>Disponibilidad</span>
+            <select formControlName="availability">
+              <option value="">
+                Sin especificar
+              </option>
+              <option value="Disponible para nuevas oportunidades">
+                Disponible para nuevas oportunidades
+              </option>
+              <option value="Disponible para proyectos freelance">
+                Disponible para proyectos freelance
+              </option>
+              <option value="Abierto a colaboraciones">
+                Abierto a colaboraciones
+              </option>
+              <option value="No disponible actualmente">
+                No disponible actualmente
+              </option>
+            </select>
+          </label>
+
+          <label class="field full-field">
+            <span>Resumen profesional</span>
+            <textarea
+              rows="6"
+              formControlName="summary"
+              placeholder="Experiencia, especialización y objetivos"
+            ></textarea>
+          </label>
+
+          <label class="field">
+            <span>Sitio web</span>
+            <input
+              type="url"
+              formControlName="website"
+              placeholder="https://misitio.com"
+            />
+          </label>
+
+          <label class="field">
+            <span>LinkedIn</span>
+            <input
+              type="url"
+              formControlName="linkedin"
+              placeholder="https://linkedin.com/in/usuario"
+            />
+          </label>
+
+          <label class="field full-field">
+            <span>GitHub</span>
+            <input
+              type="url"
+              formControlName="github"
+              placeholder="https://github.com/usuario"
+            />
+          </label>
+        </div>
+      </section>
+
+      <section
+        id="section-experience"
+        class="form-section"
+      >
+        <div class="section-heading">
+          <div>
+            <span>02 · EXPERIENCIA</span>
+            <h2>Experiencia profesional</h2>
+            <p>
+              Añade tus puestos, responsabilidades y resultados.
+            </p>
+          </div>
+
+          <button
+            type="button"
+            class="button add-button"
+            (click)="addExperience()"
+          >
+            + Añadir
+          </button>
+        </div>
+
+        <div formArrayName="experiences">
+          @for (
+            experience of experiences.controls;
+            track experience;
+            let index = $index
+          ) {
+            <article
+              class="form-card"
+              [formGroupName]="index"
+            >
+              <div class="card-heading">
+                <strong>Experiencia {{ index + 1 }}</strong>
+
+                <div class="card-actions">
+                  <button
+                    type="button"
+                    title="Subir"
+                    [disabled]="index === 0"
+                    (click)="moveExperience(index, -1)"
+                  >
+                    ↑
+                  </button>
+
+                  <button
+                    type="button"
+                    title="Bajar"
+                    [disabled]="index === experiences.length - 1"
+                    (click)="moveExperience(index, 1)"
+                  >
+                    ↓
+                  </button>
+
+                  <button
+                    type="button"
+                    class="danger-button"
+                    (click)="removeExperience(index)"
+                  >
+                    Eliminar
+                  </button>
+                </div>
+              </div>
+
+              <div class="form-grid">
+                <label class="field">
+                  <span>Empresa</span>
+                  <input
+                    type="text"
+                    formControlName="company"
+                  />
+                </label>
+
+                <label class="field">
+                  <span>Puesto</span>
+                  <input
+                    type="text"
+                    formControlName="position"
+                  />
+                </label>
+
+                <label class="field full-field">
+                  <span>Ubicación</span>
+                  <input
+                    type="text"
+                    formControlName="location"
+                  />
+                </label>
+
+                <label class="field">
+                  <span>Fecha de inicio</span>
+                  <input
+                    type="month"
+                    formControlName="startDate"
+                  />
+                </label>
+
+                <label class="field">
+                  <span>Fecha de finalización</span>
+                  <input
+                    type="month"
+                    formControlName="endDate"
+                  />
+                </label>
+
+                <label class="checkbox-field full-field">
+                  <input
+                    type="checkbox"
+                    formControlName="currentJob"
+                  />
+                  Trabajo actualmente aquí
+                </label>
+
+                <label class="checkbox-field full-field">
+                  <input
+                    type="checkbox"
+                    formControlName="visible"
+                  />
+                  Mostrar esta experiencia
+                </label>
+
+                <label class="field full-field">
+                  <span>Funciones y logros</span>
+                  <textarea
+                    rows="5"
+                    formControlName="description"
+                  ></textarea>
+                </label>
+              </div>
+            </article>
+          }
+        </div>
+      </section>
+
+      <section
+        id="section-education"
+        class="form-section"
+      >
+        <div class="section-heading">
+          <div>
+            <span>03 · FORMACIÓN</span>
+            <h2>Formación académica</h2>
+            <p>Añade estudios, cursos y certificaciones.</p>
+          </div>
+
+          <button
+            type="button"
+            class="button add-button"
+            (click)="addEducation()"
+          >
+            + Añadir
+          </button>
+        </div>
+
+        <div formArrayName="education">
+          @for (
+            item of education.controls;
+            track item;
+            let index = $index
+          ) {
+            <article
+              class="form-card"
+              [formGroupName]="index"
+            >
+              <div class="card-heading">
+                <strong>Formación {{ index + 1 }}</strong>
+
+                <div class="card-actions">
+                  <button
+                    type="button"
+                    [disabled]="index === 0"
+                    (click)="moveEducation(index, -1)"
+                  >
+                    ↑
+                  </button>
+
+                  <button
+                    type="button"
+                    [disabled]="index === education.length - 1"
+                    (click)="moveEducation(index, 1)"
+                  >
+                    ↓
+                  </button>
+
+                  <button
+                    type="button"
+                    class="danger-button"
+                    (click)="removeEducation(index)"
+                  >
+                    Eliminar
+                  </button>
+                </div>
+              </div>
+
+              <div class="form-grid">
+                <label class="field">
+                  <span>Centro educativo</span>
+                  <input
+                    type="text"
+                    formControlName="institution"
+                  />
+                </label>
+
+                <label class="field">
+                  <span>Título</span>
+                  <input
+                    type="text"
+                    formControlName="qualification"
+                  />
+                </label>
+
+                <label class="field full-field">
+                  <span>Especialización</span>
+                  <input
+                    type="text"
+                    formControlName="specialization"
+                  />
+                </label>
+
+                <label class="field">
+                  <span>Año de inicio</span>
+                  <input
+                    type="number"
+                    formControlName="startYear"
+                  />
+                </label>
+
+                <label class="field">
+                  <span>Año de finalización</span>
+                  <input
+                    type="number"
+                    formControlName="endYear"
+                  />
+                </label>
+
+                <label class="checkbox-field full-field">
+                  <input
+                    type="checkbox"
+                    formControlName="visible"
+                  />
+                  Mostrar esta formación
+                </label>
+
+                <label class="field full-field">
+                  <span>Descripción</span>
+                  <textarea
+                    rows="4"
+                    formControlName="description"
+                  ></textarea>
+                </label>
+              </div>
+            </article>
+          }
+        </div>
+      </section>
+
+      <section
+        id="section-skills"
+        class="form-section"
+      >
+        <div class="section-heading">
+          <div>
+            <span>04 · HABILIDADES</span>
+            <h2>Competencias profesionales</h2>
+          </div>
+
+          <button
+            type="button"
+            class="button add-button"
+            (click)="addSkill()"
+          >
+            + Añadir
+          </button>
+        </div>
+
+        <div
+          class="compact-list"
+          formArrayName="skills"
+        >
+          @for (
+            skill of skills.controls;
+            track skill;
+            let index = $index
+          ) {
+            <article
+              class="compact-card"
+              [formGroupName]="index"
+            >
+              <label class="field">
+                <span>Habilidad</span>
+                <input
+                  type="text"
+                  formControlName="name"
+                />
+              </label>
+
+              <label class="field">
+                <span>
+                  Nivel: {{ skill.get('level')?.value }}%
+                </span>
+
+                <input
+                  class="range-field"
+                  type="range"
+                  min="0"
+                  max="100"
+                  step="5"
+                  formControlName="level"
+                />
+              </label>
+
+              <label class="visibility-field">
+                <input
+                  type="checkbox"
+                  formControlName="visible"
+                />
+                Visible
+              </label>
+
+              <div class="card-actions">
+                <button
+                  type="button"
+                  [disabled]="index === 0"
+                  (click)="moveSkill(index, -1)"
+                >
+                  ↑
+                </button>
+
+                <button
+                  type="button"
+                  [disabled]="index === skills.length - 1"
+                  (click)="moveSkill(index, 1)"
+                >
+                  ↓
+                </button>
+
+                <button
+                  type="button"
+                  class="danger-button"
+                  (click)="removeSkill(index)"
+                >
+                  ×
+                </button>
+              </div>
+            </article>
+          }
+        </div>
+      </section>
+
+      <section
+        id="section-languages"
+        class="form-section"
+      >
+        <div class="section-heading">
+          <div>
+            <span>05 · IDIOMAS</span>
+            <h2>Idiomas</h2>
+          </div>
+
+          <button
+            type="button"
+            class="button add-button"
+            (click)="addLanguage()"
+          >
+            + Añadir
+          </button>
+        </div>
+
+        <div
+          class="compact-list"
+          formArrayName="languages"
+        >
+          @for (
+            language of languages.controls;
+            track language;
+            let index = $index
+          ) {
+            <article
+              class="compact-card language-card"
+              [formGroupName]="index"
+            >
+              <label class="field">
+                <span>Idioma</span>
+                <input
+                  type="text"
+                  formControlName="name"
+                />
+              </label>
+
+              <label class="field">
+                <span>Nivel</span>
+                <select formControlName="level">
+                  <option value="Básico">Básico</option>
+                  <option value="Intermedio">Intermedio</option>
+                  <option value="Avanzado">Avanzado</option>
+                  <option value="Profesional">Profesional</option>
+                  <option value="Nativo">Nativo</option>
+                </select>
+              </label>
+
+              <label class="visibility-field">
+                <input
+                  type="checkbox"
+                  formControlName="visible"
+                />
+                Visible
+              </label>
+
+              <button
+                type="button"
+                class="remove-button"
+                (click)="removeLanguage(index)"
+              >
+                ×
+              </button>
+            </article>
+          }
+        </div>
+      </section>
+
+      <section
+        id="section-projects"
+        class="form-section"
+      >
+        <div class="section-heading">
+          <div>
+            <span>06 · PROYECTOS</span>
+            <h2>Proyectos destacados</h2>
+            <p>
+              Presenta proyectos que demuestren tus conocimientos.
+            </p>
+          </div>
+
+          <button
+            type="button"
+            class="button add-button"
+            (click)="addProject()"
+          >
+            + Añadir
+          </button>
+        </div>
+
+        <div formArrayName="projects">
+          @for (
+            project of projects.controls;
+            track project;
+            let index = $index
+          ) {
+            <article
+              class="form-card"
+              [formGroupName]="index"
+            >
+              <div class="card-heading">
+                <strong>Proyecto {{ index + 1 }}</strong>
+
+                <div class="card-actions">
+                  <button
+                    type="button"
+                    [disabled]="index === 0"
+                    (click)="moveProject(index, -1)"
+                  >
+                    ↑
+                  </button>
+
+                  <button
+                    type="button"
+                    [disabled]="index === projects.length - 1"
+                    (click)="moveProject(index, 1)"
+                  >
+                    ↓
+                  </button>
+
+                  <button
+                    type="button"
+                    class="danger-button"
+                    (click)="removeProject(index)"
+                  >
+                    Eliminar
+                  </button>
+                </div>
+              </div>
+
+              <div class="form-grid">
+                <label class="field full-field">
+                  <span>Nombre del proyecto</span>
+                  <input
+                    type="text"
+                    formControlName="name"
+                  />
+                </label>
+
+                <label class="field full-field">
+                  <span>Descripción</span>
+                  <textarea
+                    rows="5"
+                    formControlName="description"
+                  ></textarea>
+                </label>
+
+                <label class="field full-field">
+                  <span>Tecnologías</span>
+                  <input
+                    type="text"
+                    formControlName="technologies"
+                    placeholder="Angular, TypeScript, SCSS"
+                  />
+                </label>
+
+                <label class="field">
+                  <span>Demostración</span>
+                  <input
+                    type="url"
+                    formControlName="demoUrl"
+                  />
+                </label>
+
+                <label class="field">
+                  <span>Repositorio</span>
+                  <input
+                    type="url"
+                    formControlName="repositoryUrl"
+                  />
+                </label>
+
+                <label class="checkbox-field">
+                  <input
+                    type="checkbox"
+                    formControlName="featured"
+                  />
+                  Proyecto destacado
+                </label>
+
+                <label class="checkbox-field">
+                  <input
+                    type="checkbox"
+                    formControlName="visible"
+                  />
+                  Mostrar proyecto
+                </label>
+              </div>
+            </article>
+          }
+        </div>
+      </section>
+
+      <section
+        id="section-design"
+        class="form-section"
+        formGroupName="settings"
+      >
+        <div class="section-heading">
+          <div>
+            <span>07 · DISEÑO</span>
+            <h2>Personalización visual</h2>
+            <p>
+              Selecciona la apariencia de la vista pública.
+            </p>
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <label class="field">
+            <span>Plantilla</span>
+
+            <select formControlName="template">
+              <option value="professional">
+                Profesional
+              </option>
+              <option value="technology">
+                Tecnológica
+              </option>
+              <option value="creative">
+                Creativa
+              </option>
+            </select>
+          </label>
+
+          <label class="field color-field">
+            <span>Color principal</span>
+            <input
+              type="color"
+              formControlName="primaryColor"
+            />
+          </label>
+
+          <label class="checkbox-field">
+            <input
+              type="checkbox"
+              formControlName="showPhoto"
+            />
+            Mostrar fotografía
+          </label>
+
+          <label class="checkbox-field">
+            <input
+              type="checkbox"
+              formControlName="darkMode"
+            />
+            Usar variante oscura
+          </label>
+        </div>
+      </section>
+
+      <footer class="editor-footer">
+        <button
+          type="button"
+          class="button reset-button"
+          (click)="resetPortfolio()"
+        >
+          Restablecer
+        </button>
+
+        <button
+          type="button"
+          class="button primary-button"
+          (click)="savePortfolio()"
+        >
+          Guardar portfolio
+        </button>
+      </footer>
+    </form>
+  </div>
+</main>
