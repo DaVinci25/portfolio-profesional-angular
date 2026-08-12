@@ -335,4 +335,3 @@ export class PortfolioStorageService {
     return result || 'portfolio';
   }
 }
-EOF

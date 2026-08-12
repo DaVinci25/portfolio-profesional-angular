@@ -149,6 +149,161 @@
       novalidate
     >
       <section
+        id="section-profile"
+        class="form-section"
+      >
+        <div class="section-heading">
+          <div>
+            <span>01 · PERFIL</span>
+            <h2>Tu información principal</h2>
+            <p>
+              Añade tu foto, nombre y datos de contacto para
+              presentar tu perfil profesional.
+            </p>
+          </div>
+        </div>
+
+        <div class="profile-image-editor">
+          <div class="profile-image">
+            @if (profileImage) {
+              <img
+                [src]="profileImage"
+                [alt]="
+                  'Fotografía de ' +
+                  (portfolioForm.get('fullName')?.value || 'usuario')
+                "
+              />
+            } @else {
+              <span>{{ profileInitials }}</span>
+            }
+          </div>
+
+          <div>
+            <label class="button secondary-light-button import-button">
+              {{
+                profileImage
+                  ? 'Cambiar foto de perfil'
+                  : 'Seleccionar foto de perfil'
+              }}
+
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                (change)="uploadProfileImage($event)"
+              />
+            </label>
+
+            @if (profileImage) {
+              <button
+                type="button"
+                class="text-button danger-button"
+                (click)="removeProfileImage()"
+              >
+                Eliminar foto
+              </button>
+            }
+
+            <small>
+              Formatos permitidos: JPG, PNG o WebP. La imagen se
+              comprimirá automáticamente para una carga más ligera.
+            </small>
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <label class="field">
+            <span>Nombre completo</span>
+            <input
+              type="text"
+              formControlName="fullName"
+              placeholder="Tu nombre completo"
+            />
+          </label>
+
+          <label class="field">
+            <span>Título profesional</span>
+            <input
+              type="text"
+              formControlName="professionalTitle"
+              placeholder="Ej. Frontend Developer"
+            />
+          </label>
+
+          <label class="field">
+            <span>Email</span>
+            <input
+              type="email"
+              formControlName="email"
+              placeholder="tu@correo.com"
+            />
+          </label>
+
+          <label class="field">
+            <span>Teléfono</span>
+            <input
+              type="tel"
+              formControlName="phone"
+              placeholder="+34 600 000 000"
+            />
+          </label>
+
+          <label class="field">
+            <span>Ubicación</span>
+            <input
+              type="text"
+              formControlName="location"
+              placeholder="Madrid, España"
+            />
+          </label>
+
+          <label class="field">
+            <span>Web</span>
+            <input
+              type="url"
+              formControlName="website"
+              placeholder="https://miweb.com"
+            />
+          </label>
+
+          <label class="field">
+            <span>LinkedIn</span>
+            <input
+              type="url"
+              formControlName="linkedin"
+              placeholder="https://linkedin.com/in/tu-perfil"
+            />
+          </label>
+
+          <label class="field">
+            <span>GitHub</span>
+            <input
+              type="url"
+              formControlName="github"
+              placeholder="https://github.com/tu-usuario"
+            />
+          </label>
+
+          <label class="field full-field">
+            <span>Disponibilidad</span>
+            <input
+              type="text"
+              formControlName="availability"
+              placeholder="Disponible para nuevas oportunidades"
+            />
+          </label>
+
+          <label class="field full-field">
+            <span>Resumen profesional</span>
+            <textarea
+              rows="5"
+              formControlName="summary"
+              placeholder="Escribe una breve descripción de tu perfil y experiencia."
+            ></textarea>
+          </label>
+        </div>
+      </section>
+
+      <section
   id="section-projects"
   class="form-section"
 >
